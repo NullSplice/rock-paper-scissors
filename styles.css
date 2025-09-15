@@ -1,0 +1,67 @@
+:root{
+  --bg:#0f1216; --panel:#161b22; --text:#e6edf3; --muted:#94a3b8;
+  --win-bg:#cefdce; --win-fg:#2e7d32; --lose-bg:#ffdde0; --lose-fg:#c62828;
+  --draw-bg:#e5e7eb; --draw-fg:#6b7280;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  color:var(--text); background: radial-gradient(1200px 800px at 50% -10%, #1b2230, var(--bg));
+}
+
+.container{
+  max-width:760px; margin:clamp(12px,4vh,48px) auto;
+  padding:clamp(12px,2.4vw,28px); background:var(--panel);
+  border:1px solid #232a33; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+
+.top{ text-align:center; margin-bottom:10px; }
+h1{ margin:0 0 4px; font-weight:800; letter-spacing:.4px; }
+.target{ margin:0; color:var(--muted); }
+
+.score{
+  display:flex; justify-content:space-between; gap:16px;
+  margin:16px 0 20px; padding:12px 14px; background:#0f141b;
+  border:1px solid #242c37; border-radius:14px;
+}
+.score p{ margin:0; font-weight:600; }
+
+.choices{
+  display:grid; grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:clamp(10px,2.6vw,18px); margin:6px 0 16px;
+}
+.choice{
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  width:100%; padding:clamp(12px,3.4vw,18px);
+  color:var(--text); background:#10151c; border:1px solid #222a35;
+  border-radius:16px; cursor:pointer; user-select:none;
+  transition:transform .08s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.choice img{
+  width:100%; max-width:140px; aspect-ratio:1/1; object-fit:contain; display:block;
+}
+.choice:hover{ border-color:#2b3644; transform:translateY(-1px); }
+.choice:active{ transform:translateY(1px) scale(.98); }
+.choice[disabled]{ opacity:.5; cursor:not-allowed; transform:none; }
+
+.result-pick{ display:grid; gap:6px; margin:8px 0 14px; }
+#user_choice, #computer_choice{ color:var(--muted); margin:0; }
+.banner{
+  margin:6px 0 0; padding:12px 14px; background:#0d131a;
+  border:1px solid #1f2833; border-radius:12px;
+}
+
+.controls{ display:flex; justify-content:center; margin-top:10px; }
+.reset{
+  padding:10px 16px; font-weight:600; border-radius:12px;
+  background:#0e1620; border:1px solid #223042; color:var(--text); cursor:pointer;
+}
+.reset:hover{ border-color:#35507a; }
+
+@media (max-width:520px){
+  .score{ font-size:15px; }
+  .choice span{ font-size:14px; }
+  .choice img{ max-width:108px; }
+}

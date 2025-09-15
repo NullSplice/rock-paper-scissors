@@ -1,69 +1,118 @@
-// Function to get a random choice for the computer
-function getComputerChoice() {
-  const options = ["rock", "paper", "scissors"];
-  const randomIndex = Math.floor(Math.random() * options.length);
-  return options[randomIndex];
-}
-
-// Global score variables
+// --- Game State ---
 let humanScore = 0;
 let computerScore = 0;
-let lastResult = "Game start!"; // stores last round message
+let lastResult = "Game start! Make your move.";
+const WIN_TARGET = 5;
 
-// Function to get the human player's choice, showing score + last result
-function getHumanChoice() {
-  let message = `${lastResult}\n\nScore → You: ${humanScore}, Computer: ${computerScore}\n\nEnter rock, paper, or scissors:`;
-  let choice = prompt(message).toLowerCase().trim();
+const choices = ["rock", "paper", "scissor"];
+const outcomeMap = {
+  rock:    { rock: "draw", scissor: "win",  paper: "lose" },
+  scissor: { rock: "lose", scissor: "draw", paper: "win"  },
+  paper:   { rock: "win",  scissor: "lose", paper: "draw" }
+};
 
-  // Validate input
-  while (choice !== "rock" && choice !== "paper" && choice !== "scissors") {
-    choice = prompt("Invalid choice. Please enter rock, paper, or scissors:").toLowerCase().trim();
-  }
-  return choice;
+// --- DOM refs ---
+const resultRef = document.getElementById("result");
+const userChoiceRef = document.getElementById("user_choice");
+const compChoiceRef = document.getElementById("computer_choice");
+const compScoreRef = document.getElementById("computer_score");
+const userScoreRef = document.getElementById("user_score");
+const resetBtn = document.getElementById("reset_btn");
+const choiceButtons = Array.from(document.querySelectorAll(".choice"));
+
+// --- Helpers ---
+function getComputerChoice() {
+  const idx = Math.floor(Math.random() * choices.length);
+  return choices[idx];
 }
 
-// Function to play a single round
-function playRound(humanChoice, computerChoice) {
-  if (humanChoice === computerChoice) {
-    lastResult = `It's a tie! You both chose ${humanChoice}.`;
-    return;
-  }
+function setBanner(state, text) {
+  // state: 'win' | 'lose' | 'draw' | 'neutral'
+  const styles = {
+    win:   { bg: "var(--win-bg)",  fg: "var(--win-fg)"  },
+    lose:  { bg: "var(--lose-bg)", fg: "var(--lose-fg)" },
+    draw:  { bg: "var(--draw-bg)", fg: "var(--draw-fg)" },
+    neutral: { bg: "#0d131a", fg: "var(--text)" }
+  };
+  const s = styles[state] || styles.neutral;
+  resultRef.style.backgroundColor = s.bg;
+  resultRef.style.color = s.fg;
+  resultRef.style.border = state === "neutral" ? "1px solid #1f2833" : "none";
+  resultRef.textContent = text;
+}
 
-  if (
-    (humanChoice === "rock" && computerChoice === "scissors") ||
-    (humanChoice === "paper" && computerChoice === "rock") ||
-    (humanChoice === "scissors" && computerChoice === "paper")
-  ) {
+function updateScoreboard() {
+  compScoreRef.textContent = computerScore;
+  userScoreRef.textContent = humanScore;
+}
+
+function disableChoices(disabled = true) {
+  choiceButtons.forEach(btn => btn.disabled = disabled);
+}
+
+function checkGameOver() {
+  if (humanScore >= WIN_TARGET || computerScore >= WIN_TARGET) {
+    const youWon = humanScore > computerScore;
+    const final = `Final Score → You: ${humanScore}, Computer: ${computerScore}`;
+    setBanner(youWon ? "win" : "lose", (youWon ? "🎉 You win the game! " : "💻 Computer wins the game! ") + final);
+    disableChoices(true);
+    return true;
+  }
+  return false;
+}
+
+// --- Core round handler (fusion of both versions) ---
+function playRound(humanChoice) {
+  if (humanScore >= WIN_TARGET || computerScore >= WIN_TARGET) return;
+
+  const computerChoice = getComputerChoice();
+
+  // Update picks
+  userChoiceRef.innerHTML = `You chose <span>${humanChoice.toUpperCase()}</span>`;
+  compChoiceRef.innerHTML = `Computer chose <span>${computerChoice.toUpperCase()}</span>`;
+
+  // Decide outcome
+  const outcome = outcomeMap[humanChoice][computerChoice];
+
+  if (outcome === "win") {
     humanScore++;
     lastResult = `✅ You win this round! ${humanChoice} beats ${computerChoice}.`;
-  } else {
+    setBanner("win", "YOU WIN");
+  } else if (outcome === "lose") {
     computerScore++;
     lastResult = `❌ You lose this round! ${computerChoice} beats ${humanChoice}.`;
+    setBanner("lose", "YOU LOSE");
+  } else {
+    lastResult = `It's a tie! You both chose ${humanChoice}.`;
+    setBanner("draw", "DRAW");
   }
+
+  updateScoreboard();
+  checkGameOver();
 }
 
-// Function to play the game until someone reaches 5 points
-function playGame() {
+// --- UI wiring ---
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".choice");
+  if (!btn) return;
+  const choice = btn.dataset.choice; // "rock" | "paper" | "scissor"
+  playRound(choice);
+});
+
+resetBtn.addEventListener("click", resetGame);
+
+function resetGame() {
   humanScore = 0;
   computerScore = 0;
-  lastResult = "Game start!";
-
-  while (humanScore < 5 && computerScore < 5) {
-    const humanChoice = getHumanChoice();
-    const computerChoice = getComputerChoice();
-
-    playRound(humanChoice, computerChoice);
-    console.log(lastResult);
-    console.log(`Score → You: ${humanScore}, Computer: ${computerScore}\n`);
-  }
-
-  // Final result in prompt
-  if (humanScore === 5) {
-    alert(`🎉 You win the game!\nFinal Score → You: ${humanScore}, Computer: ${computerScore}`);
-  } else {
-    alert(`💻 Computer wins the game!\nFinal Score → You: ${humanScore}, Computer: ${computerScore}`);
-  }
+  lastResult = "Game start! Make your move.";
+  updateScoreboard();
+  userChoiceRef.textContent = "";
+  compChoiceRef.textContent = "";
+  setBanner("neutral", lastResult);
+  disableChoices(false);
 }
 
-// Run the game
-playGame();
+// initial
+setBanner("neutral", lastResult);
+updateScoreboard();
+disableChoices(false);

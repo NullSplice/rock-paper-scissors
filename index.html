@@ -1,11 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Rock Paper Scissors</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rock Paper Scissor</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>Open your DevTools Console to play!</h1>
-  <script src="script.js"></script>
+  <main class="container">
+    <header class="top">
+      <h1>Rock • Paper • Scissor</h1>
+      <p class="target">First to <strong>5</strong> wins</p>
+    </header>
+
+    <section class="score" aria-live="polite">
+      <p>Computer: <span id="computer_score">0</span></p>
+      <p>You: <span id="user_score">0</span></p>
+    </section>
+
+    <section class="choices" aria-label="Choose your hand">
+      <button class="choice" data-choice="rock" type="button">
+        <img src="assets/rock.png" alt="Rock" draggable="false" />
+        <span>Rock</span>
+      </button>
+      <button class="choice" data-choice="paper" type="button">
+        <img src="assets/paper.png" alt="Paper" draggable="false" />
+        <span>Paper</span>
+      </button>
+      <button class="choice" data-choice="scissor" type="button">
+        <img src="assets/scissor.png" alt="Scissor" draggable="false" />
+        <span>Scissor</span>
+      </button>
+    </section>
+
+    <section class="result-pick" aria-live="polite">
+      <p id="user_choice"></p>
+      <p id="computer_choice"></p>
+      <p id="result" class="banner">Game start! Make your move.</p>
+    </section>
+
+    <footer class="controls">
+      <button id="reset_btn" class="reset" type="button">Reset</button>
+    </footer>
+  </main>
+
+  <script src="script.js" defer></script>
 </body>
 </html>
